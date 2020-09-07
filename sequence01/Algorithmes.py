@@ -52,7 +52,7 @@ def find_by_dichotomy(elt: int, tab):
     g, m = 0
     d = len(tab)
     while g < d - 1:
-        m = (int)(d + g) / 2
+        m = d + g // 2
         if elt < tab[m]:
             d = m
         else:
