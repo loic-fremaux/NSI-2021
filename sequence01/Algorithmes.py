@@ -17,28 +17,26 @@ def average(tab):
 def find_min(tab):
     n = len(tab)
     j = 0
-    min = tab[0]
+    low = tab[0]
     for i in range(0, n - 1):
-        if tab[j] < tab[min]:
-            min = j
-    return min
+        if tab[j] < tab[low]:
+            low = j
+    return low
 
 
 def sort_by_selection(tab):
     n = len(tab)
-    i, j, min = 0
     for i in range(0, n - 1):
-        min = i
+        low = i
         for j in range(i + 1, n - 1):
-            if tab[j] < tab[min]:
-                min = j
-        if min != i:
-            tab[min], tab[i] = tab[i], tab[min]
+            if tab[j] < tab[low]:
+                low = j
+        if low != i:
+            tab[low], tab[i] = tab[i], tab[low]
 
 
 def sort_by_insertion(tab):
     n = len(tab)
-    n, i, j, key = 0
     for i in range(1, n - 1):
         key = tab[i]
         j = i - 1
@@ -49,7 +47,7 @@ def sort_by_insertion(tab):
 
 
 def find_by_dichotomy(elt: int, tab):
-    g, m = 0
+    g, m = 0, 0
     d = len(tab)
     while g < d - 1:
         m = d + g // 2
