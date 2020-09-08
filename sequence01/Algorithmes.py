@@ -6,7 +6,7 @@ def seq_search(elt, tab):
     Find an element elt in an array tab and returns its index.
     If the array doesn't contains the element, returns -1
 
-    :param elt: the element to find
+    :param elt: the element to search
     :param tab: the array
     :return: the index of the element or -1
     """
@@ -18,11 +18,11 @@ def seq_search(elt, tab):
 
 
 print("------- seq_search -------")
-print("Trying to find 5 in [1, 3, 5, 7, 9], expected result is 2")
+print("Trying to search 5 in [1, 3, 5, 7, 9], expected result is 2")
 print("Result: ", seq_search(5, [1, 3, 5, 7, 9]))
-print("Trying to find 13 in [3, 4, 5, 10, 13], expected result is 4")
+print("Trying to search 13 in [3, 4, 5, 10, 13], expected result is 4")
 print("Result: ", seq_search(13, [3, 4, 5, 10, 13]))
-print("Trying to find 1 in [1, 3, 5, 7, 9], expected result is 0")
+print("Trying to search 1 in [1, 3, 5, 7, 9], expected result is 0")
 print("Result: ", seq_search(1, [1, 3, 5, 7, 9]))
 
 
@@ -117,7 +117,7 @@ def find_by_dichotomy(elt: int, tab):
     """
     Find an element in an array using the dichotomy method
 
-    :param elt: the element to find
+    :param elt: the element to search
     :param tab: the array
     :return: the element or False if it was not found
     """
@@ -133,11 +133,11 @@ def find_by_dichotomy(elt: int, tab):
 
 
 print("---- find_by_dichotomy ---")
-print("Trying to find 5 in [1, 3, 5, 7, 9], expected result is 2")
+print("Trying to search 5 in [1, 3, 5, 7, 9], expected result is 2")
 print("Result: ", find_by_dichotomy(5, [1, 3, 5, 7, 9]))
-print("Trying to find 13 in [3, 4, 5, 10, 13], expected result is 4")
+print("Trying to search 13 in [3, 4, 5, 10, 13], expected result is 4")
 print("Result: ", find_by_dichotomy(13, [3, 4, 5, 10, 13]))
-print("Trying to find 1 in [1, 3, 5, 7, 9], expected result is False")
+print("Trying to search 1 in [1, 3, 5, 7, 9], expected result is False")
 print("Result: ", find_by_dichotomy(13, [1, 3, 5, 7, 9]))
 
 
