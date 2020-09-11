@@ -35,7 +35,7 @@ def average(tab):
     """
     n = len(tab)
     s = 0
-    for i in range(0, n):
+    for i in range(n):
         s = s + tab[i]
     return s / n
 
@@ -56,7 +56,7 @@ def find_min(tab):
     """
     n = len(tab)
     low = tab[0]
-    for i in range(0, n - 1):
+    for i in range(n):
         if tab[i] < low:
             low = tab[i]
     return low
@@ -75,9 +75,9 @@ def sort_by_selection(tab):
     :return: the sorted array
     """
     n = len(tab)
-    for i in range(0, n - 1):
+    for i in range(n):
         low = i
-        for j in range(i + 1, n - 1):
+        for j in range(i + 1, n):
             if tab[j] < tab[low]:
                 low = j
         if low != i:
@@ -98,7 +98,7 @@ def sort_by_insertion(tab):
     :return: the sorted array
     """
     n = len(tab)
-    for i in range(1, n - 1):
+    for i in range(1, n):
         key = tab[i]
         j = i - 1
         while j >= 0 and tab[j] > key:
