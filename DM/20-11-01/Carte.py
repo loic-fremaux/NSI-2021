@@ -133,8 +133,8 @@ class PaquetDeCartes:
         self.cards.clear()
         max = (self.size - (self.size % len(Color.__members__.items()))) // 4
         for name, member in Color.__members__.items():
-            for i in range(1, max + 1):
-                self.cards.append(Carte(i, member))
+            for num in range(1, max + 1):
+                self.cards.append(Carte(num, member))
 
     def shuffle(self):
         """
@@ -148,7 +148,7 @@ class PaquetDeCartes:
         :param n: le nombre de cartes à renvoyer
         :return: une liste de Carte
         """
-        return [random.choice(self.cards) for i in range(n)]
+        return [random.choice(self.cards) for _ in range(n)]
 
     def pop(self) -> Carte:
         """
