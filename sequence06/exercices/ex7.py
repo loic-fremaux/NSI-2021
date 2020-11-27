@@ -10,6 +10,3 @@ def longueur_list(L: Liste) -> int:
         index = index.cdr()
         c += 1
     return c
-
-
-print(longueur_list(L2))

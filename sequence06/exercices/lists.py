@@ -11,13 +11,13 @@ class Liste:
     def is_empty(self) -> bool:
         return self.contenu is None
 
-    def car(self) -> Cellule:
+    def car(self):
         if self.is_empty():
             raise AttributeError("La liste est vide")
         else:
             return self.contenu.valeur
 
-    def cdr(self) -> Cellule:
+    def cdr(self):
         if self.is_empty():
             raise AttributeError("La liste est vide")
         else:
