@@ -40,13 +40,20 @@ WHERE langue1 = 'allemand' OR langue2 = 'allemand'
 ```
 
 ## Question 3
-1.
+1. `num_eleve` permet de référencer facilement un élève de la table `eleve` à la table `seconde`, il établit une relation entre les deux.
 2.
+```SQL
+SELECT nom, prenom, datenaissance
+FROM eleve AS e
+LEFT JOIN seconde AS s ON s.num_eleve = e.num_eleve
+WHERE classe = '2A';
+```
 
 ## Question 4
-| title | title |
-| :---: | :---: |
-| | |
-| | |
-| | |
-| | |
+| coordonnees |
+| :--- |
+| num_eleve (clef étrangère de la table seconde, clef primaire) |
+| adresse |
+| code postal |
+| ville |
+| email |
