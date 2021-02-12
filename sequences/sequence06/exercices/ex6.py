@@ -1,4 +1,4 @@
-from sequence06.exercices.lists import Liste, cons
+from sequences.sequence06.exercices.lists import cons
 
 L2 = cons(5, cons(2, cons(3, cons(6, cons(1, cons(7, None))))))
 

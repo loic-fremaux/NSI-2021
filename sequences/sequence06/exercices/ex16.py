@@ -1,4 +1,4 @@
-from sequence06.exercices.piles import Pile
+from sequences.sequence06.exercices.piles import Pile
 
 P1 = Pile(6)\
     .empiler(4)\

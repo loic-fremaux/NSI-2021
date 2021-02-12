@@ -1,5 +1,5 @@
-from sequence06.exercices.lists import Liste, cons
-from sequence06.exercices.ex7 import longueur_list
+from sequences.sequence06.exercices.lists import Liste, cons
+from sequences.sequence06.exercices.ex7 import longueur_list
 
 L2 = cons(5, cons(2, cons(3, cons(6, cons(1, cons(7, None))))))
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sequence06.exercices.lists import Cellule
+from sequences.sequence06.exercices.lists import Cellule
 
 
 class File:

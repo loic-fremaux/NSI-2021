@@ -1,4 +1,4 @@
-from sequence06.exercices.files import File
+from sequences.sequence06.exercices.files import File
 
 F1 = File()\
     .enfiler(3)\
