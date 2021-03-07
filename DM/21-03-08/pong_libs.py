@@ -85,9 +85,9 @@ class Ball:
 
 
 class Pad:
-    def __init__(self):
+    def __init__(self, y):
         self.x = (X_MIN + X_MAX) / 2
-        self.y = Y_MAX - BALL_RADIUS - 40
+        self.y = y
         self.length = 10 * BALL_RADIUS
 
     def show(self):
@@ -112,16 +112,16 @@ class Pad:
 
 
 class Player:
-    def __init__(self):
-        self.pad = Pad()
+    def __init__(self, y):
+        self.pad = Pad(y)
         self.score = 0
 
 
 class PongGame:
     def __init__(self):
         self.ball = Ball()
-        self.player_client = Player()
-        self.player_server = Player()
+        self.player_client = Player(BALL_RADIUS + 40)
+        self.player_server = Player(Y_MAX - BALL_RADIUS - 40)
 
     def manage_events(self):
         for event in pygame.event.get():
