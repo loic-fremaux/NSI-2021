@@ -1,29 +1,45 @@
 import pygame.freetype
 from pong_libs import *
+import socket
 
-pygame.init()
-
-pygame.freetype.init()
-main_font = pygame.font.Font(None, 32)
-title_font = pygame.font.Font(None, 64)
-
-score = 0
-player_health = 3
-nb_briques = 0
-TrueLBriques = []
-won = False
-
-game = PongGame()
-
-while True:
-    if nb_briques == score:
-        won = True
-        player_health += 1
-    game.gestion_evenements()
-    game.mise_a_jour()
-    game.affichage()
-    pygame.display.flip()  # envoi l'image a la carte graphique
-    CLOCK.tick(120)  # set a 120 fps
+HOST = '127.0.0.1'
+PORT = 56789
 
 
-pygame.quit()
+
+
+def main():
+
+
+    print("in main")
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        print("bind")
+        s.bind((HOST, PORT))
+        print("listening")
+        s.listen()
+        print("init network")
+        conn, addr = s.accept()
+        print("accepted")
+        with conn:
+            print('connected by', addr)
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+
+    # while True:
+    #     if nb_briques == score:
+    #         won = True
+    #         player_health += 1
+    #     game.manage_events()
+    #     game.update_board()
+    #     game.show()
+    #     pygame.display.flip()
+    #     CLOCK.tick(120)
+
+    # pygame.quit()
+
+
+main()
