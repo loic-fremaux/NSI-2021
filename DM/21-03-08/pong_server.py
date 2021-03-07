@@ -38,19 +38,25 @@ def wait_animation(game: PongGame):
             t = 0
         print_text(MAIN_FONT, "En attente du joueur 2" + repeat(".", t), BLUE, (WIDTH >> 1, HEIGHT >> 1))
 
-    clear_board()
-    print_text(MAIN_FONT, "Joueur connecté, lancement de la partie !", BLUE, (WIDTH >> 1, HEIGHT >> 1))
-
 
 def main():
     game = PongGame()
 
+    # START NETWORK THREAD
     net_thread = Thread(target=network_loop)
     net_thread.start()
+
+    # WAITING FOR SECOND PLAYER
     wait_animation(game)
 
+    clear_board()
+    print_text(MAIN_FONT, "Joueur connecté, lancement de la partie !", BLUE, (WIDTH >> 1, HEIGHT >> 1))
+
+    # GAME LOOP
     while True:
         game.manage_events()
+        game.update_board()
+        game.show()
         pygame.display.flip()
         CLOCK.tick(120)
 
