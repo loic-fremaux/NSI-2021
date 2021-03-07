@@ -1,3 +1,4 @@
+import time
 from threading import Thread
 
 import pygame.freetype
@@ -10,8 +11,30 @@ PORT = 56789
 connected = False
 
 
-def network_loop():
+def get_json_game_data(game: PongGame) -> str:
+    return json.dumps({
+        "pad_server": {
+            "x": game.player_server.pad.x,
+            "y": game.player_server.pad.y
+        },
+        "pad_client": {
+            "x": game.player_client.pad.x,
+            "y": game.player_client.pad.y
+        },
+        "ball": {
+            "x": game.ball.x,
+            "y": game.ball.y
+        },
+        "score": {
+            "server": game.player_server.score,
+            "client": game.player_client.score
+        }
+    })
+
+
+def network_loop(game: PongGame):
     global connected
+    sleep_rate = 1 / TICK_RATE
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind((HOST, PORT))
         server.listen()
@@ -22,7 +45,13 @@ def network_loop():
                 data = client.recv(1024)
                 if not data:
                     break
-                client.sendall(data)
+                msg = data.decode()
+                if msg != "ping":
+                    json_data = json.loads(msg)
+                    game.player_client.pad.move(json_data['mouse']['x'])
+
+                client.sendall(str.encode(get_json_game_data(game)))
+                time.sleep(sleep_rate)
 
 
 def wait_animation(game: PongGame):
@@ -43,7 +72,7 @@ def main():
     game = PongGame()
 
     # START NETWORK THREAD
-    net_thread = Thread(target=network_loop)
+    net_thread = Thread(target=network_loop, args=(game, ))
     net_thread.start()
 
     # WAITING FOR SECOND PLAYER
@@ -58,7 +87,7 @@ def main():
         game.update_board()
         game.show()
         pygame.display.flip()
-        CLOCK.tick(120)
+        CLOCK.tick(TICK_RATE)
 
 
 main()

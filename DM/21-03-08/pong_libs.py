@@ -4,6 +4,7 @@ from typing import Tuple
 import pygame
 import pygame.freetype
 import math
+import json
 
 pygame.init()
 pygame.freetype.init()
@@ -16,6 +17,8 @@ GRIS_CLAIR = pygame.Color("#0d8876")
 GRIS = pygame.Color("#154143")
 BLACK = pygame.Color("#1a1221")
 
+
+TICK_RATE = 60
 WIDTH, HEIGHT = 600, 800
 
 BALL_RADIUS = 10
@@ -56,15 +59,18 @@ class Ball:
         angle = 90 + 80 * diff / total_length
         self.angle_speed(angle)
 
-    def move(self, pad):
+    def move(self, pad1, pad2):
         if self.on_pad:
-            self.y = pad.y - 2 * BALL_RADIUS
-            self.x = pad.x
+            self.y = pad1.y - 2 * BALL_RADIUS
+            self.x = pad1.x
         else:
             self.x += self.vx
             self.y += self.vy
-            if pad.ball_collision(self) and self.vy > 0:
-                self.bounce(pad)
+            if pad1.ball_collision(self) and self.vy > 0:
+                self.bounce(pad1)
+                self.vy = -self.vy
+            if pad2.ball_collision(self) and self.vy > 0:
+                self.bounce(pad2)
                 self.vy = -self.vy
             if self.x + BALL_RADIUS > X_MAX:
                 self.vx = -self.vx
@@ -72,9 +78,10 @@ class Ball:
                 self.vx = -self.vx
             if self.y + BALL_RADIUS > Y_MAX:
                 self.on_pad = True
-                # decrease health
+                # score player two
             if self.y - BALL_RADIUS < Y_MIN:
                 self.vy = -self.vy
+                # score player one
 
 
 class Pad:
@@ -83,7 +90,7 @@ class Pad:
         self.y = Y_MAX - BALL_RADIUS - 40
         self.length = 10 * BALL_RADIUS
 
-    def show(self, x):
+    def show(self):
         pygame.draw.rect(SCREEN,
                          BLUE,
                          (int(self.x - self.length / 2), int(self.y - BALL_RADIUS), self.length, 2 * BALL_RADIUS),
@@ -104,11 +111,17 @@ class Pad:
         return vertical and horizontal
 
 
+class Player:
+    def __init__(self):
+        self.pad = Pad()
+        self.score = 0
+
+
 class PongGame:
     def __init__(self):
         self.ball = Ball()
-        self.pad = Pad()
-        self.score = (0, 0)
+        self.player_client = Player()
+        self.player_server = Player()
 
     def manage_events(self):
         for event in pygame.event.get():
@@ -122,36 +135,14 @@ class PongGame:
 
     def update_board(self):
         x, y = pygame.mouse.get_pos()
-        self.ball.move(self.pad)
-        self.pad.move(x)
+        self.player_server.pad.move(x)
+        self.ball.move(self.player_server.pad, self.player_client.pad)
 
     def show(self):
-        print("show")
-        # if player_health > 0:
-        #     if won:
-        #         SCREEN.fill(NOIR)
-        #         youWinTexte = TITLE_FONT.render("YOU WIN", True, BLEU)
-        #         textRectTitle = youWinTexte.get_rect(center=(int(X_MAX / 2), int(Y_MAX / 2)))
-        #         SCREEN.blit(youWinTexte, textRectTitle)
-        #
-        #         scoreTexte = MAIN_FONT.render("Score : " + str(score), 1, GRIS)
-        #         textRectScore = scoreTexte.get_rect(center=(int(X_MAX / 2), int(Y_MAX / 2) + 100))
-        #         SCREEN.blit(scoreTexte, textRectScore)
-        #     else:
-        #         SCREEN.fill(NOIR)  # on efface l'écran
-        #         self.ball.show()
-        #         self.pad.show(self.pad.x)
-        #         for k in range(len(TrueLBriques)):
-        #             for l in range(len(TrueLBriques[0])):
-        #                 if self.brique[k][l].en_vie():
-        #                     self.brique[k][l].show()
-        #         scoreTexte = MAIN_FONT.render("Score : " + str(score), 1, GRIS)
-        #         SCREEN.blit(scoreTexte, (0, Y_MAX - BRICK_WIDTH))
-        #         vieTexte = MAIN_FONT.render("Vie joueur : " + str(player_health), 1, GRIS)
-        #         SCREEN.blit(vieTexte, (0, Y_MAX - (BRICK_WIDTH * 2)))
-        # else:
-        #     SCREEN.fill(NOIR)
-            # GAME OVER / SCORE
+        SCREEN.fill(BLACK)
+        self.ball.show()
+        self.player_server.pad.show()
+        self.player_client.pad.show()
 
 
 # STATIC METHODS
