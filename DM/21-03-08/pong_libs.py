@@ -18,7 +18,7 @@ GRIS = pygame.Color("#154143")
 BLACK = pygame.Color("#1a1221")
 
 
-TICK_RATE = 60
+TICK_RATE = 120
 WIDTH, HEIGHT = 600, 800
 
 BALL_RADIUS = 10
@@ -59,7 +59,7 @@ class Ball:
         angle = 90 + 80 * diff / total_length
         self.angle_speed(angle)
 
-    def move(self, pad1, pad2):
+    def move(self, game, pad1, pad2):
         if self.on_pad:
             self.y = pad1.y - 2 * BALL_RADIUS
             self.x = pad1.x
@@ -77,10 +77,10 @@ class Ball:
                 self.vx = -self.vx
             if self.y + BALL_RADIUS > Y_MAX:
                 self.on_pad = True
-                # score player two
+                game.player_server.score += 1
             if self.y - BALL_RADIUS < Y_MIN:
                 self.on_pad = True
-                # score player one
+                game.player_client.score += 1
 
 
 class Pad:
@@ -135,10 +135,12 @@ class PongGame:
     def update_board(self):
         x, y = pygame.mouse.get_pos()
         self.player_server.pad.move(x)
-        self.ball.move(self.player_server.pad, self.player_client.pad)
+        self.ball.move(self, self.player_server.pad, self.player_client.pad)
 
     def show(self):
         SCREEN.fill(BLACK)
+        print_text(MAIN_FONT, str(self.player_server.score), BLUE, (20, HEIGHT / 2 - 50))
+        print_text(MAIN_FONT, str(self.player_client.score), BLUE, (20, HEIGHT / 2 + 50))
         self.ball.show()
         self.player_server.pad.show()
         self.player_client.pad.show()

@@ -55,8 +55,6 @@ def main():
     net_thread = Thread(target=network_loop, args=(game, ))
     net_thread.start()
 
-
-
     # GAME LOOP
     while True:
         game.manage_events()
