@@ -1,3 +1,5 @@
+from threading import Thread
+
 import pygame.freetype
 from pong_libs import *
 import socket
@@ -5,41 +7,52 @@ import socket
 HOST = '127.0.0.1'
 PORT = 56789
 
+connected = False
 
+
+def network_loop():
+    global connected
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.bind((HOST, PORT))
+        server.listen()
+        client, addr = server.accept()
+        connected = True
+        with client:
+            while True:
+                data = client.recv(1024)
+                if not data:
+                    break
+                client.sendall(data)
+
+
+def wait_animation(game: PongGame):
+    global connected
+    t = 3
+    while not connected:
+        game.manage_events()
+        pygame.display.flip()
+        CLOCK.tick(2)
+        clear_board()
+        t += 1
+        if t == 4:
+            t = 0
+        print_text(MAIN_FONT, "En attente du joueur 2" + repeat(".", t), BLUE, (WIDTH >> 1, HEIGHT >> 1))
+
+    clear_board()
+    print_text(MAIN_FONT, "Joueur connecté, lancement de la partie !", BLUE, (WIDTH >> 1, HEIGHT >> 1))
 
 
 def main():
+    game = PongGame()
 
+    net_thread = Thread(target=network_loop)
+    net_thread.start()
+    wait_animation(game)
 
-    print("in main")
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print("bind")
-        s.bind((HOST, PORT))
-        print("listening")
-        s.listen()
-        print("init network")
-        conn, addr = s.accept()
-        print("accepted")
-        with conn:
-            print('connected by', addr)
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                conn.sendall(data)
-
-    # while True:
-    #     if nb_briques == score:
-    #         won = True
-    #         player_health += 1
-    #     game.manage_events()
-    #     game.update_board()
-    #     game.show()
-    #     pygame.display.flip()
-    #     CLOCK.tick(120)
-
-    # pygame.quit()
+    while True:
+        game.manage_events()
+        pygame.display.flip()
+        CLOCK.tick(120)
 
 
 main()

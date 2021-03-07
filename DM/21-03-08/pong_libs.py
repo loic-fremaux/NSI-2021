@@ -6,22 +6,15 @@ import pygame.freetype
 import math
 
 pygame.init()
-while True:
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
-
-
 pygame.freetype.init()
 
 
 # MAGICK VALUES
 
-BLEU = pygame.Color("#00ffcc")
+BLUE = pygame.Color("#00ffcc")
 GRIS_CLAIR = pygame.Color("#0d8876")
 GRIS = pygame.Color("#154143")
-NOIR = pygame.Color("#1a1221")
+BLACK = pygame.Color("#1a1221")
 
 WIDTH, HEIGHT = 600, 800
 
@@ -54,7 +47,7 @@ class Ball:
         self.on_pad = True
 
     def show(self):
-        pygame.draw.rect(SCREEN, BLEU,
+        pygame.draw.rect(SCREEN, BLUE,
                          (int(self.x - BALL_RADIUS), int(self.y - BALL_RADIUS), 2 * BALL_RADIUS, 2 * BALL_RADIUS), 0)
 
     def bounce(self, pad):
@@ -92,7 +85,7 @@ class Pad:
 
     def show(self, x):
         pygame.draw.rect(SCREEN,
-                         BLEU,
+                         BLUE,
                          (int(self.x - self.length / 2), int(self.y - BALL_RADIUS), self.length, 2 * BALL_RADIUS),
                          0
                          )
@@ -163,7 +156,18 @@ class PongGame:
 
 # STATIC METHODS
 
+def clear_board():
+    SCREEN.fill(BLACK)
+
+
 def print_text(font: pygame.font.Font, message: str, color: pygame.Color, position: Tuple):
     text = font.render(message, True, color)
     rect = text.get_rect(center=position)
     SCREEN.blit(text, rect)
+
+
+def repeat(text: str, times: int) -> str:
+    s = ""
+    for i in range(times):
+        s += text
+    return s
