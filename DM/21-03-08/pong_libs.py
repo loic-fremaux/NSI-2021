@@ -69,9 +69,8 @@ class Ball:
             if pad1.ball_collision(self) and self.vy > 0:
                 self.bounce(pad1)
                 self.vy = -self.vy
-            if pad2.ball_collision(self) and self.vy > 0:
+            elif pad2.ball_collision(self) and self.vy < 0:
                 self.bounce(pad2)
-                self.vy = -self.vy
             if self.x + BALL_RADIUS > X_MAX:
                 self.vx = -self.vx
             if self.x - BALL_RADIUS < X_MIN:
@@ -80,7 +79,7 @@ class Ball:
                 self.on_pad = True
                 # score player two
             if self.y - BALL_RADIUS < Y_MIN:
-                self.vy = -self.vy
+                self.on_pad = True
                 # score player one
 
 
@@ -98,10 +97,10 @@ class Pad:
                          )
 
     def move(self, x):
-        if x - self.length >> 1 < X_MIN:
-            self.x = X_MIN + self.length >> 1
-        elif x + self.length >> 1 > X_MAX:
-            self.x = X_MAX - self.length >> 1
+        if x - self.length / 2 < X_MIN:
+            self.x = X_MIN + self.length / 2
+        elif x + self.length / 2 > X_MAX:
+            self.x = X_MAX - self.length / 2
         else:
             self.x = x
 
