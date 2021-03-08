@@ -125,7 +125,7 @@ class PongGame:
     def manage_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                return True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.ball.on_pad:

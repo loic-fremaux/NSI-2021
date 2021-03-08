@@ -1,12 +1,16 @@
+import multiprocessing
 import time
-from threading import Thread
 
 from pong_libs import *
 
 import socket
 
-HOST = '0.0.0.0'
+HOST = '127.0.0.1'
 PORT = 56789
+
+stop = False
+threads = []
+closeable = []
 
 
 def get_json_mouse_data() -> str:
@@ -20,14 +24,16 @@ def get_json_mouse_data() -> str:
 
 
 def network_loop(game: PongGame):
+    global stop
     sleep_rate = 1 / TICK_RATE
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((HOST, PORT))
     client.sendall(str.encode("ping"))
+    closeable.append(client)
     with client:
         while True:
             data = client.recv(1024)
-            if not data:
+            if not data or stop:
                 break
 
             msg = data.decode()
@@ -49,15 +55,29 @@ def network_loop(game: PongGame):
             time.sleep(sleep_rate)
 
 
+def close():
+    for t in threads:
+        t.terminate()
+    for c in closeable:
+        c.close()
+    socket.close(0)
+    sys.exit()
+
+
 def main():
+    global stop
     game = PongGame()
 
-    net_thread = Thread(target=network_loop, args=(game, ))
+    net_thread = multiprocessing.Process(target=network_loop, args=(game, ))
     net_thread.start()
+    threads.append(net_thread)
 
     # GAME LOOP
     while True:
-        game.manage_events()
+        if game.manage_events():
+            stop = True
+            break
+
         game.show()
         pygame.display.flip()
         CLOCK.tick(TICK_RATE)
