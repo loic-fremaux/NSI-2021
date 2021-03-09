@@ -4,7 +4,6 @@ from typing import Tuple
 import pygame
 import pygame.freetype
 import math
-import json
 
 pygame.init()
 pygame.freetype.init()
@@ -18,7 +17,7 @@ GRIS = pygame.Color("#154143")
 BLACK = pygame.Color("#1a1221")
 
 
-TICK_RATE = 120
+TICK_RATE = 240
 WIDTH, HEIGHT = 600, 800
 
 BALL_RADIUS = 10
@@ -122,15 +121,16 @@ class PongGame:
         self.player_client = Player(BALL_RADIUS + 40)
         self.player_server = Player(Y_MAX - BALL_RADIUS - 40)
 
-    def manage_events(self):
+    def manage_events(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                return True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.ball.on_pad:
                         self.ball.on_pad = False
                         self.ball.angle_speed(60)
+        return False
 
     def update_board(self):
         x, y = pygame.mouse.get_pos()
