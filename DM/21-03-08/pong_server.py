@@ -1,3 +1,6 @@
+import asyncio
+import json
+import multiprocessing
 import time
 from threading import Thread
 
@@ -32,33 +35,48 @@ def get_json_game_data(game: PongGame) -> str:
     })
 
 
-def network_loop(game: PongGame):
-    global connected
-    sleep_rate = 1 / TICK_RATE
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-        server.bind((HOST, PORT))
-        server.listen()
-        client, addr = server.accept()
-        connected = True
-        with client:
-            while True:
-                data = client.recv(1024)
-                if not data:
-                    break
-                msg = data.decode()
-                if msg != "ping":
-                    json_data = json.loads(msg)
-                    game.player_client.pad.move(json_data['mouse']['x'])
+class NetThread:
+    def __init__(self, game: PongGame):
+        self.closing = False
+        self.client = None
+        net_thread = Thread(target=self.network_loop, args=(game,))
+        net_thread.start()
+        self.out_thread = net_thread
 
-                client.sendall(str.encode(get_json_game_data(game)))
-                time.sleep(sleep_rate)
+    def close(self):
+        self.closing = True
+        self.client.close()
+        sys.exit()
+
+    async def send_update(self, game: PongGame):
+        print("send update")
+        self.client.sendall(str.encode(get_json_game_data(game)))
+
+    def network_loop(self, game: PongGame):
+        global connected
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+            server.bind((HOST, PORT))
+            server.listen()
+            client, addr = server.accept()
+            self.client = client
+            connected = True
+            with client:
+                while True:
+                    data = client.recv(1024)
+                    if not data or self.closing:
+                        self.close()
+                    msg = data.decode()
+                    print(msg)
+                    if msg != "ping":
+                        json_data = json.loads(msg)
+                        game.player_client.pad.move(json_data['mouse']['x'])
 
 
 def wait_animation(game: PongGame):
     global connected
     t = 3
     while not connected:
-        game.manage_events(False)
+        game.manage_events()
         pygame.display.flip()
         CLOCK.tick(2)
         clear_board()
@@ -72,8 +90,7 @@ def main():
     game = PongGame()
 
     # START NETWORK THREAD
-    net_thread = Thread(target=network_loop, args=(game, ))
-    net_thread.start()
+    net = NetThread(game)
 
     # WAITING FOR SECOND PLAYER
     wait_animation(game)
@@ -82,12 +99,19 @@ def main():
     print_text(MAIN_FONT, "Joueur connecté, lancement de la partie !", BLUE, (WIDTH >> 1, HEIGHT >> 1))
 
     # GAME LOOP
-    while True:
-        game.manage_events(True)
-        game.update_board()
-        game.show()
-        pygame.display.flip()
-        CLOCK.tick(TICK_RATE)
+    with multiprocessing.Pool() as pool:
+        while True:
+            if game.manage_events():
+                print_text(MAIN_FONT, "Connexion interrompue...", BLUE, (WIDTH >> 1, HEIGHT >> 1))
+                net.close()
+                time.sleep(3)
+                sys.exit()
+
+            game.update_board()
+            game.show()
+            pygame.display.flip()
+            multiprocessing.Process(target=net.send_update, args=(game, ))
+            CLOCK.tick(TICK_RATE)
 
 
 main()

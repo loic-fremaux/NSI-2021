@@ -4,10 +4,10 @@ from typing import Tuple
 import pygame
 import pygame.freetype
 import math
-import json
 
 pygame.init()
 pygame.freetype.init()
+
 
 # MAGICK VALUES
 
@@ -16,7 +16,8 @@ GRIS_CLAIR = pygame.Color("#0d8876")
 GRIS = pygame.Color("#154143")
 BLACK = pygame.Color("#1a1221")
 
-TICK_RATE = 120
+
+TICK_RATE = 240
 WIDTH, HEIGHT = 600, 800
 
 BALL_RADIUS = 10
@@ -29,6 +30,7 @@ TITLE_FONT = pygame.font.Font(None, 64)
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 CLOCK = pygame.time.Clock()
 
+
 # GAME DEFINITION
 pygame.display.set_caption("Pong Game")
 
@@ -40,11 +42,11 @@ class Ball:
         self.vx = self.speed * math.cos(math.radians(angle))
         self.vy = self.speed * math.sin(math.radians(angle))
 
-    def __init__(self, pad):
+    def __init__(self):
         self.x, self.y = (400, 400)
         self.speed = 5
         self.angle_speed(60)
-        self.pad = pad
+        self.on_pad = True
 
     def show(self):
         pygame.draw.rect(SCREEN, BLUE,
@@ -57,12 +59,9 @@ class Ball:
         self.angle_speed(angle)
 
     def move(self, game, pad1, pad2):
-        if self.pad is not None:
-            if self.pad == game.player_client.pad:
-                self.y = self.pad.y + 2 * BALL_RADIUS
-            else:
-                self.y = self.pad.y - 2 * BALL_RADIUS
-            self.x = self.pad.x
+        if self.on_pad:
+            self.y = pad1.y - 2 * BALL_RADIUS
+            self.x = pad1.x
         else:
             self.x += self.vx
             self.y += self.vy
@@ -76,10 +75,10 @@ class Ball:
             if self.x - BALL_RADIUS < X_MIN:
                 self.vx = -self.vx
             if self.y + BALL_RADIUS > Y_MAX:
-                self.pad = game.player_client.pad
+                self.on_pad = True
                 game.player_server.score += 1
             if self.y - BALL_RADIUS < Y_MIN:
-                self.pad = game.player_server.pad
+                self.on_pad = True
                 game.player_client.score += 1
 
 
@@ -118,22 +117,20 @@ class Player:
 
 class PongGame:
     def __init__(self):
+        self.ball = Ball()
         self.player_client = Player(BALL_RADIUS + 40)
         self.player_server = Player(Y_MAX - BALL_RADIUS - 40)
-        self.ball = Ball(self.player_server.pad)
 
-    def manage_events(self, b):
+    def manage_events(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                return True
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    if self.ball.pad is not None:
-                        if b and self.ball.pad == self.player_server.pad:
-                            self.ball.pad = None
-                        elif not b:
-                            self.ball.pad = None  # send status on socket
+                    if self.ball.on_pad:
+                        self.ball.on_pad = False
                         self.ball.angle_speed(60)
+        return False
 
     def update_board(self):
         x, y = pygame.mouse.get_pos()
