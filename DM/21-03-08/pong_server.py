@@ -58,7 +58,7 @@ def wait_animation(game: PongGame):
     global connected
     t = 3
     while not connected:
-        game.manage_events()
+        game.manage_events(False)
         pygame.display.flip()
         CLOCK.tick(2)
         clear_board()
@@ -83,7 +83,7 @@ def main():
 
     # GAME LOOP
     while True:
-        game.manage_events()
+        game.manage_events(True)
         game.update_board()
         game.show()
         pygame.display.flip()

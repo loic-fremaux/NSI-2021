@@ -57,7 +57,7 @@ def main():
 
     # GAME LOOP
     while True:
-        game.manage_events()
+        game.manage_events(False)
         game.show()
         pygame.display.flip()
         CLOCK.tick(TICK_RATE)
